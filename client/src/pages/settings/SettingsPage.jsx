@@ -356,7 +356,7 @@ export const SettingsPage = () => {
             { label: 'Platform', value: 'INVOXA Enterprise v2.0' },
             { label: 'Stack', value: 'MERN (MongoDB, Express, React, Node.js)' },
             { label: 'Environment', value: import.meta.env.MODE || 'development' },
-            { label: 'API Endpoint', value: import.meta.env.VITE_API_URL || 'http://localhost:5000' },
+            { label: 'API Endpoint', value: import.meta.env.VITE_API_URL || (typeof window !== 'undefined' ? `${window.location.origin}/api` : 'http://localhost:5000') },
           ].map((item) => (
             <div key={item.label} className="flex items-center justify-between py-1.5 border-b border-slate-100 dark:border-slate-800 last:border-0">
               <span className="text-slate-500 dark:text-slate-400">{item.label}</span>
