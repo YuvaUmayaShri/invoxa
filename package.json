@@ -1,0 +1,34 @@
+{
+  "name": "invoxa-platform",
+  "version": "2.0.0",
+  "description": "INVOXA — Intelligent Invoice Operations (MERN Stack)",
+  "scripts": {
+    "install:all": "npm install && npm --prefix server install && npm --prefix client install",
+    "server": "npm --prefix server run dev",
+    "client": "npm --prefix client run dev",
+    "dev": "concurrently --kill-others-on-fail -n \"SERVER,CLIENT\" -c \"bgBlue.bold,bgGreen.bold\" \"npm run server\" \"npm run client\"",
+    "seed": "npm --prefix server run seed",
+    "build": "npm --prefix client run build"
+  },
+  "keywords": [
+    "invoice",
+    "payment",
+    "mern",
+    "automation",
+    "verification",
+    "vendor-management"
+  ],
+  "author": "Yuva Umaya Shri A",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/YuvaUmayaShri/invoxa.git"
+  },
+  "bugs": {
+    "url": "https://github.com/YuvaUmayaShri/invoxa/issues"
+  },
+  "homepage": "https://github.com/YuvaUmayaShri/invoxa#readme",
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}

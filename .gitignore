@@ -1,0 +1,43 @@
+# Dependencies
+node_modules/
+*/node_modules/
+client/node_modules/
+server/node_modules/
+
+# Production build outputs
+dist/
+client/dist/
+build/
+
+# Environment and secrets
+.env
+.env.local
+.env.*.local
+server/.env
+!server/.env.example
+!client/.env.example
+
+# Logs and runtime data
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+
+# Editor and OS metadata
+.DS_Store
+Thumbs.db
+~$*
+*.tmp
+*.swp
+*.swo
+.vscode/
+.idea/
+
+# Uploaded documents (keep directory structure with .gitkeep)
+server/uploads/*
+!server/uploads/.gitkeep
+
+# Scratch and temporary IDE directories
+scratch/
+.system_generated/
+.gemini/
