@@ -44,7 +44,12 @@ export const LoginPage = () => {
       // Welcome animation finishes then navigates
     } else {
       setLoading(false);
-      setErrorMessage("That didn't work. Please check your email or password and try again.");
+      const isNetworkErr = res.error && (res.error.toLowerCase().includes('failed to fetch') || res.error.toLowerCase().includes('network'));
+      setErrorMessage(
+        isNetworkErr
+          ? 'Unable to reach the server. Please check your connection or backend status.'
+          : (res.error || "That didn't work. Please check your email or password and try again.")
+      );
       setPassword('');
       triggerShake();
     }
