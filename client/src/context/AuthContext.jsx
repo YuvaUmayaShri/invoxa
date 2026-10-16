@@ -53,6 +53,24 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const register = async (formData) => {
+    try {
+      const res = await api.post('/api/auth/register', formData);
+      if (res.success && res.data) {
+        const { token: receivedToken, user: receivedUser } = res.data;
+        localStorage.setItem('invoxa_token', receivedToken);
+        localStorage.setItem('invoxa_user', JSON.stringify(receivedUser));
+        sessionStorage.removeItem(`invoxa_welcome_${receivedUser._id}`);
+        setToken(receivedToken);
+        setUser(receivedUser);
+        return { success: true, user: receivedUser, message: res.message };
+      }
+      throw new Error(res.message || 'Registration failed');
+    } catch (err) {
+      return { success: false, error: err.message || 'Failed to create account. Please try again.' };
+    }
+  };
+
   const logout = async () => {
     try {
       if (token) {
@@ -94,6 +112,7 @@ export const AuthProvider = ({ children }) => {
         isAuthenticated,
         loading,
         login,
+        register,
         logout,
         updateCurrentUser,
       }}

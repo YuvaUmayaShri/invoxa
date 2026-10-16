@@ -9,6 +9,7 @@ import IntroScreen from './components/ui/IntroScreen';
 
 // Lazy load pages
 const LoginPage        = lazy(() => import('./pages/auth/LoginPage'));
+const RegisterPage     = lazy(() => import('./pages/auth/RegisterPage'));
 const DashboardPage    = lazy(() => import('./pages/dashboard/DashboardPage'));
 const InvoicesPage     = lazy(() => import('./pages/invoices/InvoicesPage'));
 const VendorsPage      = lazy(() => import('./pages/vendors/VendorsPage'));
@@ -59,6 +60,7 @@ function AppRoutes() {
     <Suspense fallback={<PageLoader />}>
       <Routes>
         <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
+        <Route path="/register" element={<PublicRoute><RegisterPage /></PublicRoute>} />
 
         <Route path="/" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
           <Route index element={<Navigate to="/dashboard" replace />} />
