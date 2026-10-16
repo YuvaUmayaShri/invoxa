@@ -320,8 +320,9 @@ export const LoginPage = () => {
                 Quick Access — Demo Accounts
               </span>
             </div>
-            <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:'8px' }}>
+            <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:'6px' }}>
               {[
+                { label:'Yuva', sub:'Admin', email:'yuva@invoxa.com', pass:'Yuva@123', accent:'#E9A992', accentDark:'rgba(233,169,146,0.20)', textColor:'#8C4E32' },
                 { label:'Admin', sub:'Executive', email:'admin@example.com', pass:'Admin@123', accent:'#F6C7B6', accentDark:'rgba(246,199,182,0.15)', textColor:'#8C4E32' },
                 { label:'Accounts', sub:'AP Team', email:'accounts@example.com', pass:'Accounts@123', accent:'#BFD8B8', accentDark:'rgba(191,216,184,0.15)', textColor:'#376642' },
                 { label:'Vendor', sub:'ABC Tech', email:'vendor@example.com', pass:'Vendor@123', accent:'#F5E2C0', accentDark:'rgba(217,164,65,0.12)', textColor:'#A0783B' },

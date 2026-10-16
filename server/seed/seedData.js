@@ -6,6 +6,16 @@
 const users = [
   {
     name: 'Yuva Umaya Shri A',
+    email: 'yuva@invoxa.com',
+    password: 'Yuva@123',
+    role: 'ADMIN',
+    department: 'Executive Administration',
+    phone: '+91 94451 82910',
+    avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80',
+    isActive: true,
+  },
+  {
+    name: 'Yuva Umaya Shri A',
     email: 'admin@example.com',
     password: 'Admin@123',
     role: 'ADMIN',

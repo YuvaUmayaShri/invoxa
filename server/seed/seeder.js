@@ -579,9 +579,9 @@ const autoSeedIfEmpty = async () => {
   }
 };
 
-// If run directly: node seeder.js
 if (require.main === module) {
-  require('dotenv').config({ path: '../.env' });
+  const path = require('path');
+  require('dotenv').config({ path: path.join(__dirname, '../.env') });
   const { connectDB, disconnectDB } = require('../config/db');
 
   (async () => {
