@@ -96,7 +96,7 @@ const runAutomatedReminders = async () => {
       }
 
       // 3. Pending Approval Alert
-      if (inv.status === 'PENDING_APPROVAL' || inv.verificationStatus === 'VERIFIED' && inv.approvalStatus === 'PENDING') {
+      if (inv.status === 'PENDING_APPROVAL' || (inv.verificationStatus === 'VERIFIED' && inv.approvalStatus === 'PENDING')) {
         const recentApprovalReminder = await Reminder.findOne({
           invoice: inv._id,
           type: 'PENDING_APPROVAL',

@@ -91,9 +91,9 @@ export const ActivityLogPage = () => {
 
   const filterTabs = [
     { label: 'All Activities', value: '' },
-    { label: 'Invoices',       value: 'Invoice' },
-    { label: 'Payments',       value: 'Payment' },
-    { label: 'Vendors',        value: 'Vendor' },
+    { label: 'Invoices',       value: 'INVOICE' },
+    { label: 'Payments',       value: 'PAYMENT' },
+    { label: 'Vendors',        value: 'VENDOR' },
   ];
 
   return (

@@ -35,7 +35,7 @@ export const RecentActivityWidget = ({ activities = [] }) => {
           <h4 className="text-sm font-bold" style={{ color: 'var(--text-primary, #26332B)' }}>Recent Activity Log</h4>
         </div>
         <button
-          onClick={() => navigate('/invoices')}
+          onClick={() => navigate('/activity')}
           className="text-xs font-semibold hover:underline"
           style={{ color: '#E9A992' }}
         >

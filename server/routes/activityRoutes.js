@@ -5,7 +5,7 @@ const { protect } = require('../middleware/authMiddleware');
 const { authorize } = require('../middleware/roleMiddleware');
 
 router.use(protect);
-router.use(authorize('ADMIN', 'ACCOUNTS TEAM'));
+router.use(authorize('ADMIN', 'ACCOUNTS TEAM', 'VENDOR'));
 
 router.get('/', getActivityLogs);
 

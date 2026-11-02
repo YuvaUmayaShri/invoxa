@@ -4,9 +4,10 @@
 
 export const formatCurrency = (amount, currency = 'INR') => {
   if (amount === undefined || amount === null || isNaN(amount)) return '₹0';
-  return new Intl.NumberFormat('en-IN', {
+  const curr = (currency || 'INR').toUpperCase();
+  return new Intl.NumberFormat(curr === 'INR' ? 'en-IN' : 'en-US', {
     style: 'currency',
-    currency: 'INR',
+    currency: curr,
     maximumFractionDigits: 0,
   }).format(amount);
 };

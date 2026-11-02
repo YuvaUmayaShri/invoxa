@@ -15,10 +15,21 @@ const getNotifications = async (req, res) => {
         { targetRole: 'ALL' },
         { targetRole: userRole },
       ],
+      deletedBy: { $ne: userId },
     };
 
-    const notifications = await Notification.find(query).sort({ createdAt: -1 }).limit(50);
-    const unreadCount = await Notification.countDocuments({ ...query, isRead: false });
+    const rawNotifications = await Notification.find(query).sort({ createdAt: -1 }).limit(50);
+
+    const notifications = rawNotifications.map((notif) => {
+      const obj = notif.toObject();
+      const isReadForUser =
+        obj.isRead === true ||
+        (Array.isArray(obj.readBy) && obj.readBy.some((id) => id.toString() === userId.toString()));
+      obj.isRead = isReadForUser;
+      return obj;
+    });
+
+    const unreadCount = notifications.filter((n) => !n.isRead).length;
 
     return successResponse(res, { notifications, unreadCount }, 'Notifications retrieved');
   } catch (err) {
@@ -31,15 +42,27 @@ const getNotifications = async (req, res) => {
 // @access  Private
 const markAsRead = async (req, res) => {
   try {
+    const userId = req.user._id;
     const notification = await Notification.findById(req.params.id);
     if (!notification) {
       return errorResponse(res, 'Notification not found.', 'Not found', 404);
     }
 
-    notification.isRead = true;
+    if (!notification.readBy) notification.readBy = [];
+    if (!notification.readBy.some((id) => id.toString() === userId.toString())) {
+      notification.readBy.push(userId);
+    }
+
+    if (notification.user && notification.user.toString() === userId.toString()) {
+      notification.isRead = true;
+    }
+
     await notification.save();
 
-    return successResponse(res, notification, 'Notification marked as read');
+    const notifObj = notification.toObject();
+    notifObj.isRead = true;
+
+    return successResponse(res, notifObj, 'Notification marked as read');
   } catch (err) {
     return errorResponse(res, 'Failed to update notification.', err.message, 500);
   }
@@ -59,10 +82,15 @@ const markAllAsRead = async (req, res) => {
         { targetRole: 'ALL' },
         { targetRole: userRole },
       ],
-      isRead: false,
+      deletedBy: { $ne: userId },
     };
 
-    await Notification.updateMany(query, { $set: { isRead: true } });
+    await Notification.updateMany(query, {
+      $addToSet: { readBy: userId },
+    });
+
+    // Also mark direct notifications as isRead
+    await Notification.updateMany({ user: userId }, { $set: { isRead: true } });
 
     return successResponse(res, {}, 'All notifications marked as read.');
   } catch (err) {
@@ -75,12 +103,24 @@ const markAllAsRead = async (req, res) => {
 // @access  Private
 const deleteNotification = async (req, res) => {
   try {
+    const userId = req.user._id;
     const notification = await Notification.findById(req.params.id);
     if (!notification) {
       return errorResponse(res, 'Notification not found.', 'Not found', 404);
     }
 
-    await notification.deleteOne();
+    // If it's a private notification for this user, delete completely
+    if (notification.user && notification.user.toString() === userId.toString()) {
+      await notification.deleteOne();
+    } else {
+      // If shared notification, hide it for this user without affecting others
+      if (!notification.deletedBy) notification.deletedBy = [];
+      if (!notification.deletedBy.some((id) => id.toString() === userId.toString())) {
+        notification.deletedBy.push(userId);
+        await notification.save();
+      }
+    }
+
     return successResponse(res, {}, 'Notification deleted successfully');
   } catch (err) {
     return errorResponse(res, 'Failed to delete notification.', err.message, 500);

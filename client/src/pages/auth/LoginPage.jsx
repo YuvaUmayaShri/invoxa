@@ -61,6 +61,10 @@ export const LoginPage = () => {
   };
 
   const handleWelcomeDone = () => {
+    if (successUser?._id) {
+      sessionStorage.setItem(`invoxa_welcome_${successUser._id}`, '1');
+    }
+    sessionStorage.setItem('invoxa_welcome_user', '1');
     navigate('/dashboard');
   };
 

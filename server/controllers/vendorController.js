@@ -12,17 +12,25 @@ const getVendors = async (req, res) => {
     const { search, status, category, sortBy = 'companyName', sortOrder = 'asc' } = req.query;
     const query = {};
 
-    if (status) query.status = status;
-    if (category) query.category = category;
+    // Role-based scope: VENDORS only see their own profile
+    if (req.user.role === 'VENDOR') {
+      if (!req.user.vendor) {
+        return successResponse(res, [], 'No vendor profile associated with this account.');
+      }
+      query._id = req.user.vendor;
+    } else {
+      if (status) query.status = status;
+      if (category) query.category = category;
 
-    if (search) {
-      query.$or = [
-        { name: { $regex: search, $options: 'i' } },
-        { companyName: { $regex: search, $options: 'i' } },
-        { email: { $regex: search, $options: 'i' } },
-        { gstin: { $regex: search, $options: 'i' } },
-        { vendorId: { $regex: search, $options: 'i' } },
-      ];
+      if (search) {
+        query.$or = [
+          { name: { $regex: search, $options: 'i' } },
+          { companyName: { $regex: search, $options: 'i' } },
+          { email: { $regex: search, $options: 'i' } },
+          { gstin: { $regex: search, $options: 'i' } },
+          { vendorId: { $regex: search, $options: 'i' } },
+        ];
+      }
     }
 
     const sort = { [sortBy]: sortOrder === 'asc' ? 1 : -1 };
@@ -39,6 +47,11 @@ const getVendors = async (req, res) => {
 // @access  Private
 const getVendorById = async (req, res) => {
   try {
+    // Role-based scope: VENDORS cannot access other vendors' profiles
+    if (req.user.role === 'VENDOR' && req.params.id !== req.user.vendor?.toString()) {
+      return errorResponse(res, 'Access denied. You can only view your own vendor profile.', 'Forbidden', 403);
+    }
+
     const vendor = await Vendor.findById(req.params.id);
     if (!vendor) {
       return errorResponse(res, 'Vendor not found.', 'Not found', 404);

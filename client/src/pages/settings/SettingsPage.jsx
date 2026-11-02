@@ -121,10 +121,8 @@ export const SettingsPage = () => {
 
   const roleBadgeColor = {
     ADMIN: 'bg-rose-100 dark:bg-rose-950/60 text-rose-700 dark:text-rose-400',
-    FINANCE_MANAGER: 'bg-violet-100 dark:bg-violet-950/60 text-violet-700 dark:text-violet-400',
-    ACCOUNTS_PAYABLE: 'bg-blue-100 dark:bg-blue-950/60 text-blue-700 dark:text-blue-400',
-    AUDITOR: 'bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400',
-    VENDOR: 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400',
+    'ACCOUNTS TEAM': 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300',
+    VENDOR: 'bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300',
   };
 
   return (

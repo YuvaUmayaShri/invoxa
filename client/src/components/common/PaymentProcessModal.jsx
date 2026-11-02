@@ -411,10 +411,10 @@ export const PaymentProcessModal = ({
               </div>
               {invoice.fileUrl && (
                 <a
-                  href={invoice.fileUrl}
+                  href={invoice.fileUrl.startsWith('http') ? invoice.fileUrl : `${import.meta.env.VITE_API_URL || ''}${invoice.fileUrl}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 text-[11px] font-bold text-indigo-600 dark:text-indigo-400 hover:underline"
+                  className="inline-flex items-center gap-1 text-[11px] font-bold text-[#E9A992] hover:underline"
                 >
                   <ExternalLink className="w-3.5 h-3.5" />
                   View Original Document

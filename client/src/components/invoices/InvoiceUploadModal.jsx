@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Modal from '../common/Modal';
 import { api } from '../../services/api';
 import { useToast } from '../../context/ToastContext';
+import { useAuth } from '../../context/AuthContext';
 import {
   UploadCloud,
   FileCheck,
@@ -13,6 +14,7 @@ import {
 } from 'lucide-react';
 
 export const InvoiceUploadModal = ({ isOpen, onClose, onInvoiceCreated }) => {
+  const { user } = useAuth();
   const { showToast } = useToast();
   const [vendors, setVendors] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -42,19 +44,24 @@ export const InvoiceUploadModal = ({ isOpen, onClose, onInvoiceCreated }) => {
       setInvoiceDate(today);
       setDueDate(due);
 
-      // Fetch vendors
-      api.get('/api/vendors').then((res) => {
-        if (res.data) {
-          setVendors(res.data);
-          if (res.data.length > 0) setVendor(res.data[0]._id);
-        }
-      });
+      if (user?.role === 'VENDOR') {
+        const vendorId = user.vendor?._id || user.vendor || '';
+        setVendor(vendorId);
+      } else {
+        // Fetch vendors for Admin / Accounts Team
+        api.get('/api/vendors').then((res) => {
+          if (res.data) {
+            setVendors(res.data);
+            if (res.data.length > 0) setVendor(res.data[0]._id);
+          }
+        });
+      }
     } else {
       setSelectedFile(null);
       setUploadedFileMeta(null);
       setVerificationResult(null);
     }
-  }, [isOpen]);
+  }, [isOpen, user]);
 
   const handleFileDrop = (e) => {
     e.preventDefault();
@@ -85,20 +92,28 @@ export const InvoiceUploadModal = ({ isOpen, onClose, onInvoiceCreated }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!vendor || !invoiceNumber || !amount || !invoiceDate || !dueDate) {
+    const effectiveVendorId = user?.role === 'VENDOR' ? (user.vendor?._id || user.vendor) : vendor;
+    if (!effectiveVendorId || !invoiceNumber || !amount || !invoiceDate || !dueDate) {
       showToast('Please fill in all mandatory fields.', 'warning');
       return;
     }
 
     setLoading(true);
     try {
+      const totalAmount = Number(amount);
+      const rate = Number(taxRate) || 0;
+      const computedSubtotal = rate > 0 ? Math.round((totalAmount / (1 + rate / 100)) * 100) / 100 : totalAmount;
+      const computedTaxAmount = rate > 0 ? Math.round((totalAmount - computedSubtotal) * 100) / 100 : 0;
+
       const payload = {
-        vendor,
-        invoiceNumber,
+        vendor: effectiveVendorId,
+        invoiceNumber: invoiceNumber.trim(),
         invoiceDate,
         dueDate,
-        amount: Number(amount),
-        taxRate: Number(taxRate),
+        subtotal: computedSubtotal,
+        taxRate: rate,
+        taxAmount: computedTaxAmount,
+        amount: totalAmount,
         notes,
         fileUrl: uploadedFileMeta?.fileUrl || '',
         fileName: uploadedFileMeta?.fileName || selectedFile?.name || '',
@@ -299,18 +314,28 @@ export const InvoiceUploadModal = ({ isOpen, onClose, onInvoiceCreated }) => {
               <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
                 Vendor Name *
               </label>
-              <select
-                value={vendor}
-                onChange={(e) => setVendor(e.target.value)}
-                required
-                className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 outline-none focus:ring-2 focus:ring-indigo-500"
-              >
-                {vendors.map((v) => (
-                  <option key={v._id} value={v._id}>
-                    {v.companyName} ({v.vendorId})
-                  </option>
-                ))}
-              </select>
+              {user?.role === 'VENDOR' ? (
+                <input
+                  type="text"
+                  readOnly
+                  disabled
+                  value={user?.companyName || user?.vendor?.companyName || user?.name || 'Registered Vendor'}
+                  className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 outline-none cursor-not-allowed"
+                />
+              ) : (
+                <select
+                  value={vendor}
+                  onChange={(e) => setVendor(e.target.value)}
+                  required
+                  className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 outline-none focus:ring-2 focus:ring-indigo-500"
+                >
+                  {vendors.map((v) => (
+                    <option key={v._id} value={v._id}>
+                      {v.companyName} ({v.vendorId})
+                    </option>
+                  ))}
+                </select>
+              )}
             </div>
 
             {/* Invoice Number */}

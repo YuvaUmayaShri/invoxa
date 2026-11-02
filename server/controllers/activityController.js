@@ -3,14 +3,20 @@ const { successResponse, errorResponse } = require('../utils/apiResponse');
 
 // @desc    Get activity logs with search and pagination
 // @route   GET /api/activity
-// @access  Private (Admin / Accounts)
+// @access  Private (Admin / Accounts / Vendor)
 const getActivityLogs = async (req, res) => {
   try {
     const { search, entity, action, page = 1, limit = 20 } = req.query;
     const query = {};
 
-    if (entity) query.entity = entity;
-    if (action) query.action = action;
+    // Scope to user if Vendor
+    if (req.user.role === 'VENDOR') {
+      query.user = req.user._id;
+    }
+
+    // Support case-insensitive entity match
+    if (entity) query.entity = entity.trim().toUpperCase();
+    if (action) query.action = action.trim();
 
     if (search) {
       query.$or = [

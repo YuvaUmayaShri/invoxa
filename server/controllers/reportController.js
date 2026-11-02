@@ -480,7 +480,9 @@ const getPaymentReports = async (req, res) => {
 // @access  Private
 const getVendorReports = async (req, res) => {
   try {
-    const vendors = await Vendor.find().sort({ outstandingAmount: -1 });
+    const isVendor = req.user.role === 'VENDOR';
+    const query = isVendor ? { _id: req.user.vendor } : {};
+    const vendors = await Vendor.find(query).sort({ outstandingAmount: -1 });
     return successResponse(res, vendors, 'Vendor report generated.');
   } catch (err) {
     return errorResponse(res, 'Failed to fetch vendor report.', err.message, 500);

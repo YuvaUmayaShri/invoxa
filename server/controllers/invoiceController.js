@@ -253,16 +253,30 @@ const createInvoice = async (req, res) => {
       return errorResponse(res, 'Specified vendor does not exist.', 'Invalid Vendor', 400);
     }
 
+    // Compute tax breakdown if not explicitly supplied
+    const totalAmount = Number(amount);
+    const parsedTaxRate = Number(taxRate) || 0;
+    let computedSubtotal = Number(subtotal);
+    let computedTaxAmount = Number(taxAmount);
+
+    if ((isNaN(computedTaxAmount) || computedTaxAmount === 0) && parsedTaxRate > 0 && !isNaN(totalAmount)) {
+      computedSubtotal = Math.round((totalAmount / (1 + parsedTaxRate / 100)) * 100) / 100;
+      computedTaxAmount = Math.round((totalAmount - computedSubtotal) * 100) / 100;
+    } else if (isNaN(computedSubtotal) || computedSubtotal === 0) {
+      computedSubtotal = totalAmount;
+      computedTaxAmount = computedTaxAmount || 0;
+    }
+
     // Run automated verification engine
     const invoicePayload = {
       invoiceNumber: invoiceNumber.trim(),
       vendor: vendorId,
       invoiceDate,
       dueDate,
-      subtotal: subtotal || amount,
-      taxRate,
-      taxAmount: taxAmount || 0,
-      amount,
+      subtotal: computedSubtotal,
+      taxRate: parsedTaxRate,
+      taxAmount: computedTaxAmount,
+      amount: totalAmount,
       items,
     };
 
@@ -292,10 +306,10 @@ const createInvoice = async (req, res) => {
       vendor: vendorId,
       invoiceDate,
       dueDate,
-      subtotal: subtotal || amount,
-      taxRate,
-      taxAmount: taxAmount || 0,
-      amount,
+      subtotal: computedSubtotal,
+      taxRate: parsedTaxRate,
+      taxAmount: computedTaxAmount,
+      amount: totalAmount,
       currency,
       items,
       notes: notes || '',
